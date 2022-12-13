@@ -254,7 +254,11 @@ onMounted(()=>{
             position: sticky;
             top: 0;
             z-index: 1;
-            background-color: #fff;
+            // background-color: #fff;
+            height: 20px;
+            backdrop-filter: saturate(50%) blur(8px);
+            background: rgba(255,255,255,.7);
+
         }
         .list{
             padding: 10px;

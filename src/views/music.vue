@@ -11,12 +11,12 @@ let data = reactive<{songs:Array<{id:number,name:string,mv:number,al:{picUrl:str
 })
 const getMusicDetail = (val:{songs:Array<{id:number,name:string,mv:number,al:{picUrl:string}}>})=>{
   console.log('...music...',val)
-  if(val.songs&&val.songs!==[]){
+  if(val.songs){
     data.songs = val.songs
   }
 }
 const getMusicList = (val:{songs:Array<{id:number,name:string,mv:number,al:{picUrl:string}}>})=>{
-  if(val.songs&&val.songs!==[]){
+  if(val.songs){
     data.songs.push(...val.songs)
   }
 }
