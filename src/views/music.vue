@@ -15,6 +15,11 @@ const getMusicDetail = (val:{songs:Array<{id:number,name:string,mv:number,al:{pi
     data.songs = val.songs
   }
 }
+const getMusicList = (val:{songs:Array<{id:number,name:string,mv:number,al:{picUrl:string}}>})=>{
+  if(val.songs&&val.songs!==[]){
+    data.songs.push(...val.songs)
+  }
+}
 const getMusicUrl = async (val:number)=>{
   console.log('...url...',val)
   // data.url = val
@@ -36,7 +41,7 @@ const getShow =(val:boolean)=>{
 <template>
   <div class="warp">
     <Head @getMusicInfo="getMusicDetail"></Head>
-    <content @getMusicUrl="getMusicUrl" :show="show" :songs="data.songs"></content>
+    <content @getMusicUrl="getMusicUrl" @getMusicInfo="getMusicList" :show="show" :songs="data.songs"></content>
     <foot @getShow="getShow" :musicUrl="data.url"></foot>
   </div>
 </template>

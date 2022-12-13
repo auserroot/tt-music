@@ -6,6 +6,7 @@ export default {
     getAllList:'/cloudsearch',
     getMusicUrl:'/song/url',
     getMVurl:'/mv/url',
+    getMvDetail:'/mv/detail',
     getLyric:'/lyric',//id
     getMsg:'/comment/music',//id ,limit,offset,before
 } 

@@ -2,17 +2,28 @@
 import { get } from '@/api/axios';
 import api from '@/api/url';
 import { toReactive } from '@vueuse/shared';
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
+import Mv from './mv.vue';
 
 const songs = defineProps<{songs:{name:string,id:number,mv:number,al:{picUrl:string}}[],show:boolean}>()
 let songList = toReactive(songs) 
-const $emit = defineEmits<{(e:'getMusicUrl',value:number):void}>()
+const $emit = defineEmits<{(e:'getMusicUrl',value:number):void,(e:'getMusicInfo',value:{songs:[]}):void}>()
 let src = ref('')
-const playMusic = (item:{id:number,al:{picUrl:string}})=>{
+let id = ref(0)
+let musicName = ref('')
+let mvUrl = ref('')
+let dialogVisible = ref(false)
+const close = (val:boolean)=>{
+    dialogVisible.value = val
+    mvUrl.value = ''
+}
+const playMusic = (item:{id:number,name:string,al:{picUrl:string}})=>{
     src.value = item.al.picUrl
     $emit('getMusicUrl',item.id)
     getLyric(item.id)
     getMsg(item.id)
+    id.value = item.id
+    musicName.value = item.name
 }
 interface msg {
     commentId:number,
@@ -40,25 +51,91 @@ const getLyric = async(id:number) =>{
 }
 
 const getMsg = async (id:number)=>{
-  let params = {id:id,limit:100}
+  let params = {id:id,limit:30,offset:(curPage - 1 )*30}
   try {
     const res = await get(api.getMsg,{params})
     console.log('....msg....',res)
     if(res.code===200){
-       data.msgs =  res.comments
+       data.msgs.push(...res.comments)
     }
   } catch (error) {
     console.log(error)
   }
 }
+
+const getMVurl = async (id:number) =>{
+    const params = {id:id,r:1080}
+    // try {
+    //     const r = await get(api.getMvDetail,{params:{mvid:id}})
+    //     console.log('////////////',r)
+    // } catch (error) {
+        
+    // }
+    try {
+        const res = await get(api.getMVurl,{params})
+        console.log(res)
+        res.code === 200&&(mvUrl.value = res.data.url)&&(dialogVisible.value=true)
+    } catch (error) {
+        console.log(error)
+    }
+}
+let curPage = 1
+
+const searchParams = async (param:string|null)=>{
+    const params = {
+        keywords:param,
+        limit:30,
+        offset:(curPage - 1 )*30
+    }
+    try {
+        const res = await get(api.getAllList,{params})
+        console.log('..music',res)
+        if(res.code===200){
+            console.log('..............')
+            $emit('getMusicInfo',res.result)
+        }
+    } catch (error) {
+        console.log('..search..',error)
+    }
+}
+const param = sessionStorage.getItem('keywords')
+
+const more = (flag:string) =>{
+    let st:any = null
+    let sh:any = null
+    let ch:any = null
+    if(flag==='music'){
+         st = document.querySelector('.left')?.scrollTop
+         sh = document.querySelector('.music')?.scrollHeight
+         ch =  document.querySelector('.left')?.clientHeight
+         if(sh -st +10 <=ch){
+            console.log('.....//')
+            curPage++
+            searchParams(param)
+        }
+    }else {
+         st = document.querySelector('.right')?.scrollTop
+         sh = document.querySelector('.list')?.scrollHeight
+         ch =  document.querySelector('.right')?.clientHeight
+    
+        if(sh -st + 10 <=ch){
+            console.log('...../....')
+            curPage++
+            getMsg(id.value)
+        }
+    }
+}
+
+onMounted(()=>{
+})
 </script>
 <template>
     <div class="content">
-        <div class="left">
+        <div class="left" @scroll="more('music')">
             <div class="music">
-                <div class="item" v-for="item in songList.songs" :key="item.id" @click="playMusic(item)">
-                    <span class="name">{{item.name}}</span>
-                    <i class="mv" v-if="item.mv"><i class="cont"></i></i>
+                <div class="item" v-for="item in songList.songs" :key="item.id">
+                    <span class="name" @click="playMusic(item)">{{item.name}}</span>
+                    <i class="mv" v-if="item.mv" @click="getMVurl(item.mv)"><i class="cont"></i></i>
                 </div>
             </div>
         </div>
@@ -67,10 +144,10 @@ const getMsg = async (id:number)=>{
             <img :class="['musicp',show?'rotate1':'']" src="../assets/1.png" alt="music">
             <img class="pic" :src="src">
         </div>
-        <div class="right">
+        <div class="right" @scroll="more('msg')">
             <div class="head-right">评论：</div>
-            <div class="list" v-for="item in data.msgs" :key="item.commentId">
-                <div class="user">
+            <div class="list">
+                <div class="user" v-for="item in data.msgs" :key="item.commentId">
                     <div class="top">
                         <img :src="item.user.avatarUrl" alt="tou">
                         <span class="name">{{item.user.nickname}}</span>
@@ -80,6 +157,8 @@ const getMsg = async (id:number)=>{
                 </div>
             </div>
         </div>
+
+        <mv :musicName="musicName" :mvUrl="mvUrl" :dialogVisible="dialogVisible" @close="close"></mv>
     </div>
 </template>
 <style lang="scss">
