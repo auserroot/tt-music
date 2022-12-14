@@ -4,6 +4,7 @@ const server = axios.create()
 
 console.log('baseUrl',import.meta.env)
 server.defaults.baseURL = import.meta.env.VITE_API_BASE
+// server.defaults.baseURL = 'http://cloud-music.pl-fe.cn/'
 server.defaults.timeout = 10000
 server.defaults.withCredentials = true //cros
 

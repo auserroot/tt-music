@@ -37,12 +37,17 @@ let show = ref(false)
 const getShow =(val:boolean)=>{
   show.value = val
 }
+
+let flag = ref('')
+const stop = (val:string) =>{
+  flag.value = val
+}
 </script>
 <template>
   <div class="warp">
     <Head @getMusicInfo="getMusicDetail"></Head>
-    <content @getMusicUrl="getMusicUrl" @getMusicInfo="getMusicList" :show="show" :songs="data.songs"></content>
-    <foot @getShow="getShow" :musicUrl="data.url"></foot>
+    <content @getMusicUrl="getMusicUrl" @getMusicInfo="getMusicList" @stopMusic="stop" :show="show" :songs="data.songs"></content>
+    <foot @getShow="getShow" :musicUrl="data.url" :stopFlag="flag"></foot>
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { onMounted, ref, toRef, watch } from 'vue';
 
-const porps = defineProps<{musicUrl:string}>()
+const porps = defineProps<{musicUrl:string,stopFlag:string}>()
 const $emit = defineEmits<{(e:'getShow',value:boolean):void}>()
 
 const handlerPause = ()=>{
