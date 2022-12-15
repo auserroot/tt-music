@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { get } from '@/api/axios';
+import { get, post } from '@/api/axios';
 import api from '@/api/url';
 import { onBeforeMount, provide, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -8,7 +8,7 @@ import { saveKeywords } from '@/stores/counter'
 let keybords = ref('')
 const tit = import.meta.env.VITE_APP_TITLE
 let $emit = defineEmits<{(e:'getMusicInfo',value:{songs:[]}):void}>()
-// const $router = useRouter()
+const $router = useRouter()
 const $store = saveKeywords()
 const searchParams = async (param:string)=>{
     // $router.push({
@@ -44,6 +44,19 @@ const getHotList = async() =>{
         console.log(err)
     }
 }
+const isShow = ref(false)
+const showLogout = ()=>{
+    isShow.value = !isShow.value
+}
+const logout = async()=>{
+    try {
+        const res = await post(api.logout,{})
+        console.log('退出',res)
+        res.code===200&&$router.replace('/')
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 onBeforeMount(()=>{
     // keybords.value = 'hot'
@@ -54,7 +67,7 @@ onBeforeMount(()=>{
 </script>
 <template>
     <div class="header">
-        <div class="tit">{{tit}}</div>
+        <div class="tit" @mouseenter="showLogout" @mouseleave="showLogout">{{tit}}<span style="margin-left:12px;cursor:pointer" v-if="isShow" @click="logout">logout</span></div>
         <el-input class="input" v-model="keybords" @keydown.enter="searchParams" placeholder="Please enter params to search music" />
     </div>
 </template>
