@@ -236,9 +236,9 @@ onUnmounted(()=>document.querySelector('audio')?.removeEventListener('timeupdate
             </div>
         </div>
         <div class="main">
-            <img :class="show?'roaid rotate2':'roaid'" src="../assets/2.png" alt="music">
-            <img :class="['musicp',show?'rotate1':'']" src="../assets/1.png" alt="music">
-            <img class="pic" :src="src">
+            <img draggable="false" :class="show?'roaid rotate2':'roaid'" src="../assets/2.png" alt="music">
+            <img draggable="false" :class="['musicp',show?'rotate1':'']" src="../assets/1.png" alt="music">
+            <img draggable="false" class="pic" :src="src">
 
             <div class="lyric">
                 <!-- <div v-for="(item,ind) in lyricListArr" :class="['lyric_item',index===ind?'lyric_active':'']" :style="index===ind?`display:block;transform: translateY(${-4}px)`:'display:none'"  :key="item.id">{{item.lyric}}</div> -->
