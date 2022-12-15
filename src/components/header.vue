@@ -3,18 +3,22 @@ import { get } from '@/api/axios';
 import api from '@/api/url';
 import { onBeforeMount, provide, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { saveKeywords } from '@/stores/counter'
 
 let keybords = ref('')
 const tit = import.meta.env.VITE_APP_TITLE
 let $emit = defineEmits<{(e:'getMusicInfo',value:{songs:[]}):void}>()
-const $router = useRouter()
+// const $router = useRouter()
+const $store = saveKeywords()
 const searchParams = async (param:string)=>{
     // $router.push({
     //     params: {
     //         keywords:keybords.value?keybords.value:param,
     //     }
     // })
-    sessionStorage.setItem('keywords',keybords.value?keybords.value:param)
+    // sessionStorage.setItem('keywords',keybords.value?keybords.value:param)
+    $store.setKey(keybords.value?keybords.value:param)
+
     const params = {
         keywords:keybords.value?keybords.value:param,
         limit:30,
@@ -43,7 +47,8 @@ const getHotList = async() =>{
 
 onBeforeMount(()=>{
     // keybords.value = 'hot'
-    searchParams('hot')
+    // searchParams('hot')
+    searchParams('热歌')
     // getHotList()
 })
 </script>

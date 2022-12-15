@@ -8,8 +8,7 @@ const close = ()=>{
 }
 </script>
 <template>
-    <el-dialog v-model="porps.dialogVisible" title="MV" width="60%" center draggable>
-        <span>{{musicName}}</span>
+    <el-dialog v-model="porps.dialogVisible" :title="musicName" width="60%" center draggable>
         <video class="video" :src="mvUrl" autoplay controls></video>
         <template #footer>
         <span class="dialog-footer">

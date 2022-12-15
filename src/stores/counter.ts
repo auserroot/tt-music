@@ -7,6 +7,14 @@ export const useCounterStore = defineStore('counter', () => {
   function increment() {
     count.value++
   }
-
   return { count, doubleCount, increment }
+})
+
+export const saveKeywords = defineStore('keywords',()=>{
+  const key = ref('')
+  const keywords = computed(()=>key.value)
+  const setKey = (val:string)=>{
+    key.value = val 
+  }
+  return {key,keywords,setKey}
 })

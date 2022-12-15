@@ -4,6 +4,7 @@ import api from '@/api/url';
 import { toReactive } from '@vueuse/shared';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import Mv from './mv.vue';
+import {saveKeywords}from '@/stores/counter'
 
 const songs = defineProps<{songs:{name:string,id:number,mv:number,al:{picUrl:string}}[],show:boolean}>()
 let songList = toReactive(songs) 
@@ -62,11 +63,11 @@ type obj = {
 }
 const formaterTime = (val:string):string=>{
     const i = val.split('[')[1].split(']')[0]
-    console.log(val,i)
+    // console.log(val,i)
     let m = parseInt(i.split(':')[0])
     let s = parseInt(i.split(':')[1].split('.')[0])
     let ms = i.split('.')[1]
-    console.log(m,s,ms)
+    // console.log(m,s,ms)
     let time = ''
     if(m>0){
         s += m*60
@@ -79,7 +80,7 @@ const formaterTime = (val:string):string=>{
 const filterLyric = (val:string)=>{
     // console.log('...lyric...',val)
     let lyricList = val.split('\n')
-    console.log(lyricList)
+    // console.log(lyricList)
     let arr: { id: number; lyricTime: string; lyric: string; }[] = []
     lyricList.map((item,index)=>{
         let obj:obj = {id:0,lyricTime:'',lyric:''}
@@ -91,7 +92,7 @@ const filterLyric = (val:string)=>{
             arr.push(obj)
         }
     })
-    console.log(arr)
+    // console.log(arr)
     lyricListArr.value = arr
     // let lyricTimeList = lyricList.match(/\[\d{2}:\d{2}.\d{2,3}\]/)
 
@@ -119,16 +120,29 @@ const active = ()=>{
         }
     })
     
-    console.log('$e',2)
+    // console.log('$e',2)
 
 }
 
 
 const getMsg = async (id:number)=>{
-  let params = {id:id,limit:30,offset:(curPage - 1 )*30}
+  let params = {id:id,limit:30}
   try {
     const res = await get(api.getMsg,{params})
     console.log('....msg....',res)
+    if(res.code===200){
+       data.msgs = res.comments
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getMoreMsg = async (id:number)=>{
+  let params = {id:id,limit:30,offset:(curPage - 1 )*30}
+  try {
+    const res = await get(api.getMsg,{params})
+    console.log('....moremsg....',res)
     if(res.code===200){
        data.msgs.push(...res.comments)
     }
@@ -145,6 +159,7 @@ const getMVurl = async (id:number) =>{
     // } catch (error) {
         
     // }
+    songList.songs.map(item=>(item.mv===id)&&(musicName.value = item.name))
     const el = document.querySelector('audio')
     try {
         const res = await get(api.getMVurl,{params})
@@ -166,16 +181,19 @@ const searchParams = async (param:string|null)=>{
         const res = await get(api.getAllList,{params})
         console.log('..music',res)
         if(res.code===200){
-            console.log('..............')
+            // console.log('..............')
             $emit('getMusicInfo',res.result)
         }
     } catch (error) {
         console.log('..search..',error)
     }
 }
-const param = sessionStorage.getItem('keywords')
+// const param = sessionStorage.getItem('keywords')
+const $store = saveKeywords()
+const param = $store.keywords
 
 const more = (flag:string) =>{
+    // console.log(11111111111111111111111)
     let st:any = null
     let sh:any = null
     let ch:any = null
@@ -183,20 +201,23 @@ const more = (flag:string) =>{
          st = document.querySelector('.left')?.scrollTop
          sh = document.querySelector('.music')?.scrollHeight
          ch =  document.querySelector('.left')?.clientHeight
+        //  console.log('11111111111',st,sh,ch)
          if(sh -st +10 <=ch){
             console.log('.....//')
             curPage++
             searchParams(param)
         }
     }else {
-         st = document.querySelector('.right')?.scrollTop
+         st = document.querySelector('.content>.right')?.scrollTop
          sh = document.querySelector('.list')?.scrollHeight
-         ch =  document.querySelector('.right')?.clientHeight
+         ch =  document.querySelector('.content>.right')?.clientHeight
+
+         console.log('---------------',st,sh,ch)
     
-        if(sh -st + 10 <=ch){
+        if(sh -st + 30 <= ch){
             console.log('...../....')
             curPage++
-            getMsg(id.value)
+            getMoreMsg(id.value)
         }
     }
 }
@@ -383,6 +404,9 @@ onUnmounted(()=>document.querySelector('audio')?.removeEventListener('timeupdate
                 margin: 10px 0;
                 border-radius: 6px;
                 .top{
+                    display: flex;
+                    // justify-content: space-between;
+                    align-items: center;
                     img{
                         width: 20px;
                         height: 20px;
@@ -396,7 +420,7 @@ onUnmounted(()=>document.querySelector('audio')?.removeEventListener('timeupdate
                 }
                 .content-text{
                     font-size: 14px;
-                    font-weight: 500;
+                    font-weight: 600;
                     text-indent: 14px;
                 }
                 .ip{
