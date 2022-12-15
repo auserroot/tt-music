@@ -14,6 +14,7 @@ export default {
     login:'/login/cellphone', 
     logout:'/logout',
     status:'/login/status',
+    account:'/user/account',
     anonimous:'/register/anonimous',//游客状态
     getQrKey:'/login/qr/key',//获取二维码key
     getQr:'/login/qr/create',//生成二维码 key 可选参数: qrimg 传入后会额外返回二维码图片 base64 编码

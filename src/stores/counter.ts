@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useCounterStore = defineStore('counter', () => {
@@ -17,4 +17,23 @@ export const saveKeywords = defineStore('keywords',()=>{
     key.value = val 
   }
   return {key,keywords,setKey}
+})
+interface user {
+  nickname:string,
+  userId:number,
+  backgroundUrl:string,
+  avatarUrl:string,
+}
+export const userInfoStore = defineStore('user',()=>{
+  let user = reactive<user>({
+    nickname:'',
+    userId:0,
+    backgroundUrl:'',
+    avatarUrl:''
+  })
+  const userInfo = computed(()=>user)
+  const setUserInfo = (val:user)=>{
+    user = val 
+  }
+  return {user,userInfo,setUserInfo}
 })

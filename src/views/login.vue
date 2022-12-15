@@ -4,12 +4,13 @@ import api from '@/api/url'
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus'
+import {userInfoStore}from'@/stores/counter'
 
 const formDate = reactive({
   phone: '',
   captcha: '',
 })
-
+let timer:any = null
 const $router = useRouter()
 const getcaptcha = async()=>{
     const data = {phone:formDate.phone}
@@ -57,7 +58,12 @@ const anonimousLogin = async()=>{
 const qr = ref(false)
 const change =()=>{
     qr.value = !qr.value
-    qr.value===false&&getQr()
+    if(qr.value===false){
+        getQr()
+    }else{
+        clearInterval(timer)
+        timer = null
+    }
 }
 const qrUrl = ref('')
 const getQrKey = async()=>{
@@ -77,7 +83,7 @@ const getQr = async()=>{
         console.log('qr..',res)
         if(res.code===200){
             qrUrl.value = res.data.qrimg
-            let timer = setInterval(async()=>{
+            timer = setInterval(async()=>{
                 const status = await checkQr(key)
                 switch (status) {
                     case 800: getQr()
@@ -89,7 +95,7 @@ const getQr = async()=>{
                     case 803:clearInterval(timer)
                     break;
                 }
-            },1000)
+            },2000)
         }else ElMessage({message:"error!",type:'error'})
     } catch (error) {
         console.log(error)
@@ -103,6 +109,7 @@ const checkQr = async(key:string):Promise<number>=>{
         code = res.code
         if(res.code===803){
             document.cookie = res.cookie
+            getLoginStatus(res.cookie)
             $router.push('/music')
         }
         // else ElMessage({message:"error!",type:'error'})
@@ -111,6 +118,17 @@ const checkQr = async(key:string):Promise<number>=>{
     }
     return code
 }
+
+const $store = userInfoStore()
+const getLoginStatus = async(cookie:string)=>{
+    const data = {cookie}
+    // const status = await post(api.status,{data})
+    const account = await post(api.account,{data})
+    // console.log('loginstatus...',status,account)
+    console.log('acc..',account)
+    $store.setUserInfo(account.profile)
+}
+
 onMounted(()=>{
     getQr()
 })
