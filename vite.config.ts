@@ -39,9 +39,6 @@ export default defineConfig({
         entryFileNames: 'static/js/[name]-[hash].js',
         assetFileNames: 'static/[ext]/[name]-[hash].[ext]'
       },
-      // brotliSize: false, // 不统计
-      // target: 'esnext', 
-      // minify: 'esbuild' // 混淆器，terser构建后文件体积更小
     }
   }
 })

@@ -3,13 +3,14 @@ import { get, post } from '@/api/axios';
 import api from '@/api/url';
 import { onBeforeMount, provide, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { saveKeywords } from '@/stores/counter'
+import { saveKeywords, userInfoStore } from '@/stores/counter'
 
 let keybords = ref('')
 const tit = import.meta.env.VITE_APP_TITLE
 let $emit = defineEmits<{(e:'getMusicInfo',value:{songs:[]}):void}>()
 const $router = useRouter()
 const $store = saveKeywords()
+const $user = userInfoStore()
 const searchParams = async (param:string)=>{
     // $router.push({
     //     params: {
@@ -57,7 +58,7 @@ const logout = async()=>{
         console.log(error)
     }
 }
-
+const login = ref(sessionStorage.getItem('login'))
 onBeforeMount(()=>{
     // keybords.value = 'hot'
     // searchParams('hot')
@@ -69,9 +70,10 @@ onBeforeMount(()=>{
     <div class="header">
         <div class="tit" @mouseenter="showLogout" @mouseleave="showLogout">{{tit}}<span style="margin-left:12px;cursor:pointer" v-if="isShow" @click="logout">logout</span></div>
         <el-input class="input" v-model="keybords" @keydown.enter="searchParams" placeholder="Please enter params to search music" />
+        <img v-if="login" :src="$user.userInfo.avatarUrl" draggable="false" alt="tou">
     </div>
 </template>
-<style lang="scss">
+<style lang="scss" scoped>
 .header{
     width: 100%;
     height: 60px;
@@ -87,13 +89,17 @@ onBeforeMount(()=>{
         font-size: 16px;
         color: whitesmoke;
     }
+    img{
+        width: 40px;
+        border-radius: 50%;
+    }
     .input{
         width: 70%;
     }
-    .el-input__wrapper{
+    :deep(.el-input__wrapper){
         border-radius: 16px;
     }
-    .el-input__inner{
+    :deep(.el-input__inner){
         text-indent: 14px;
         font-size: 16px;
         font-weight: 600;

@@ -86,16 +86,16 @@ const getQr = async()=>{
             timer = setInterval(async()=>{
                 const status = await checkQr(key)
                 switch (status) {
-                    case 800: getQr()
+                    case 800: getQr();
                     break;
-                    case 801:''
+                    case 801:'';
                     break;
-                    case 802:''
+                    case 802:'';
                     break;
-                    case 803:clearInterval(timer)
+                    case 803:clearInterval(timer);timer=null;
                     break;
                 }
-            },2000)
+            },3000)
         }else ElMessage({message:"error!",type:'error'})
     } catch (error) {
         console.log(error)
@@ -126,11 +126,26 @@ const getLoginStatus = async(cookie:string)=>{
     const account = await post(api.account,{data})
     // console.log('loginstatus...',status,account)
     console.log('acc..',account)
+    sessionStorage.setItem('login',account.profile.userId?'1':'0')
     $store.setUserInfo(account.profile)
+}
+
+const getUser=async ()=>{
+    const res = await get(api.user,{params:{uid:$store.userInfo.userId}})
+    console.log('...getUser...',res)
 }
 
 onMounted(()=>{
     getQr()
+    const val:{nickname:string,userId:number,backgroundUrl:string,avatarUrl:string,} = {
+        avatarUrl: "http://p1.music.126.net/IRvBTuxjDcq31SsUCGso9Q==/109951165356903032.jpg",
+        backgroundUrl: "http://p1.music.126.net/lDP67FahDo1vspVjpCXbfA==/109951165731856573.jpg",
+        nickname: "Realm_me",
+        userId: 591979276
+    }
+    $store.setUserInfo(val)
+
+    // getUser()
 })
 </script>
 <template>

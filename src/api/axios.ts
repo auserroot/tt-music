@@ -6,7 +6,8 @@ export const get = (url:string,{params = {}}={}):Promise<any>=>{
             url,
             params,
             method:'get',
-            responseType:'json'
+            responseType:'json',
+            withCredentials: true,
         }).then((res)=>resolve(res.data))
         .catch((err)=>reject(err.data))
     })
@@ -17,7 +18,8 @@ export const post = (url:string,{data = {}}):Promise<any>=>{
         axios({
             url,
             data,
-            method:'post'
+            method:'post',
+            withCredentials: true,
         }).then((res)=>resolve(res.data))
         .catch((err)=>reject(err.data))
     })

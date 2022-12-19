@@ -25,15 +25,19 @@ interface user {
   avatarUrl:string,
 }
 export const userInfoStore = defineStore('user',()=>{
-  let user = reactive<user>({
+  let user = ref<user>({
     nickname:'',
     userId:0,
     backgroundUrl:'',
     avatarUrl:''
   })
-  const userInfo = computed(()=>user)
+  const userInfo = computed(()=>{
+    // return user.value?user.value:JSON.parse(sessionStorage.getItem('userInfo')||'')
+    return sessionStorage.getItem('userInfo')?JSON.parse(sessionStorage.getItem('userInfo')||''):user.value
+  })
   const setUserInfo = (val:user)=>{
-    user = val 
+    user.value = val
+    sessionStorage.setItem('userInfo',JSON.stringify(val))
   }
   return {user,userInfo,setUserInfo}
 })
